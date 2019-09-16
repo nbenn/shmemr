@@ -1,16 +1,17 @@
 Package: shmemr
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
+Authors@R:
+    person(given = "Nicolas",
+           family = "Bennett",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
+           email = "nicolas.bennett@stat.math.etht.ch")
 Description: What the package does (one paragraph).
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-LinkingTo: 
-    Rcpp
-Imports: 
+LinkingTo:
+    Rcpp,
+    BH
+Imports:
     Rcpp
