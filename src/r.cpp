@@ -15,22 +15,7 @@
 
 #include <shmemr/mem.hpp>
 
-#include <Rcpp.h>
-
-Rcpp::List create_tag(std::string name, double length, std::size_t type)
-{
-  return Rcpp::List::create(
-    Rcpp::Named("mem_id", Rcpp::wrap(name)),
-    Rcpp::Named("mem_type", Rcpp::wrap(type)),
-    Rcpp::Named("length", Rcpp::wrap(length))
-  );
-}
-
-template <typename T>
-Rcpp::XPtr<T> xptr(SEXP x)
-{
-  return Rcpp::XPtr<T>(x, R_ExternalPtrTag(x), R_ExternalPtrProtected(x));
-}
+#include "utils.hpp"
 
 // [[Rcpp::export]]
 SEXP mem_init(std::string name, double length, std::size_t type)
