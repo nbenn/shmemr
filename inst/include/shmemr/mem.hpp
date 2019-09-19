@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef INST_INCLUDE_RMADA_MEM_H_
-#define INST_INCLUDE_RMADA_MEM_H_
+#ifndef INST_INCLUDE_SHMEMR_MEM_H_
+#define INST_INCLUDE_SHMEMR_MEM_H_
 
 #include <string>
 
@@ -93,4 +93,4 @@ uintmax_t file_size(std::string);
 void create_file(std::string);
 void resize_file(std::string, uintmax_t);
 
-#endif  // INST_INCLUDE_RMADA_MEM_H_
+#endif  // INST_INCLUDE_SHMEMR_MEM_H_
