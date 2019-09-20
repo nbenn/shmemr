@@ -13,12 +13,20 @@
 // You should have received a copy of the GNU General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef INST_INCLUDE_SHMEMR_UTILS_H_
+#define INST_INCLUDE_SHMEMR_UTILS_H_
+
 #include <Rcpp.h>
 
-Rcpp::List create_tag(std::string, double, std::size_t);
-
-template <typename T>
-Rcpp::XPtr<T> xptr(SEXP x)
+template<class T, typename ...Ar>
+SEXP create_memory(Ar&&... rg)
 {
-  return Rcpp::XPtr<T>(x, R_ExternalPtrTag(x), R_ExternalPtrProtected(x));
+  static_assert(std::is_base_of<Memory, T>::value,
+    "Only classes that are derived from Memory are allowed."
+  );
+
+  auto mem = new T(std::forward<Ar>(rg)...);
+  return Rcpp::XPtr<Memory>(dynamic_cast<Memory*>(mem), true);
 }
+
+#endif  // INST_INCLUDE_SHMEMR_UTILS_H_

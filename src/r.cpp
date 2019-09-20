@@ -14,73 +14,65 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <shmemr/mem.hpp>
-
-#include "utils.hpp"
+#include <shmemr/utils.hpp>
 
 // [[Rcpp::export]]
-SEXP mem_init(std::string name, double length, std::size_t type)
+SEXP shared_mem_init(std::string name, double length)
 {
-  auto tag = create_tag(name, length, type);
-  auto len = static_cast<uintmax_t>(length);
+  return create_memory<SharedMemory>(name, static_cast<uintmax_t>(length));
+}
 
-  switch(type) {
-    case 1: {
-      auto res = new SharedMemory(name, len);
-      return Rcpp::XPtr<SharedMemory>(res, true, Rcpp::wrap(tag));
-    }
-    case 2: {
-      auto res = new FileMemory(name, len);
-      return Rcpp::XPtr<FileMemory>(res, true, Rcpp::wrap(tag));
-    }
-    default: throw std::runtime_error("Cannot match memory type.");
-  }
+// [[Rcpp::export]]
+SEXP file_mem_init(std::string name, double length)
+{
+  return create_memory<FileMemory>(name, static_cast<uintmax_t>(length));
 }
 
 // [[Rcpp::export]]
 void mem_attach(SEXP mem)
 {
-  xptr<Memory>(mem)->attach();
+  Rcpp::XPtr<Memory>(mem)->attach();
 }
 
 // [[Rcpp::export]]
 void mem_detach(SEXP mem)
 {
-  xptr<Memory>(mem)->detach();
+  Rcpp::XPtr<Memory>(mem)->detach();
 }
 
 // [[Rcpp::export]]
 bool is_mem_attached(SEXP mem)
 {
-  return xptr<Memory>(mem)->is_attached();
+  return Rcpp::XPtr<Memory>(mem)->is_attached();
 }
 
 // [[Rcpp::export]]
 SEXP get_mem_address(SEXP mem)
 {
-  auto ptr = xptr<Memory>(mem)->get_address();
+  auto ptr = Rcpp::XPtr<Memory>(mem)->get_address();
   return R_MakeExternalPtr(ptr, R_NilValue, R_NilValue);
 }
 
 // [[Rcpp::export]]
 double get_mem_length(SEXP mem)
 {
-  return static_cast<double>(xptr<Memory>(mem)->get_size());
+  return static_cast<double>(Rcpp::XPtr<Memory>(mem)->get_size());
 }
 
 // [[Rcpp::export]]
 std::string get_mem_id(SEXP mem)
 {
-  return xptr<Memory>(mem)->get_id();
+  return Rcpp::XPtr<Memory>(mem)->get_id();
 }
 
 // [[Rcpp::export]]
 void mem_remove(SEXP mem)
 {
-  xptr<Memory>(mem)->remove();
+  Rcpp::XPtr<Memory>(mem)->remove();
 }
 
 // [[Rcpp::export]]
 void mem_resize(SEXP mem, double new_length)
 {
-  xptr<Memory>(mem)->resize(static_cast<uintmax_t>(new_length));
+  Rcpp::XPtr<Memory>(mem)->resize(static_cast<uintmax_t>(new_length));
 }
