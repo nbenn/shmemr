@@ -12,6 +12,8 @@ Encoding: UTF-8
 LazyData: true
 LinkingTo:
     Rcpp,
-    BH
+    BH,
+    assertthat
 Imports:
     Rcpp
+RoxygenNote: 6.1.1
