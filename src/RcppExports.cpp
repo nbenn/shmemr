@@ -114,6 +114,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// mem_addr_str
+std::string mem_addr_str(SEXP mem);
+RcppExport SEXP _shmemr_mem_addr_str(SEXP memSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type mem(memSEXP);
+    rcpp_result_gen = Rcpp::wrap(mem_addr_str(mem));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_shmemr_shared_mem_init", (DL_FUNC) &_shmemr_shared_mem_init, 2},
@@ -126,6 +137,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_shmemr_get_mem_id", (DL_FUNC) &_shmemr_get_mem_id, 1},
     {"_shmemr_mem_remove", (DL_FUNC) &_shmemr_mem_remove, 1},
     {"_shmemr_mem_resize", (DL_FUNC) &_shmemr_mem_resize, 2},
+    {"_shmemr_mem_addr_str", (DL_FUNC) &_shmemr_mem_addr_str, 1},
     {NULL, NULL, 0}
 };
 

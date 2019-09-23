@@ -2,42 +2,46 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 shared_mem_init <- function(name, length) {
-    .Call('_shmemr_shared_mem_init', PACKAGE = 'shmemr', name, length)
+    .Call(`_shmemr_shared_mem_init`, name, length)
 }
 
 file_mem_init <- function(name, length) {
-    .Call('_shmemr_file_mem_init', PACKAGE = 'shmemr', name, length)
+    .Call(`_shmemr_file_mem_init`, name, length)
 }
 
 mem_attach <- function(mem) {
-    invisible(.Call('_shmemr_mem_attach', PACKAGE = 'shmemr', mem))
+    invisible(.Call(`_shmemr_mem_attach`, mem))
 }
 
 mem_detach <- function(mem) {
-    invisible(.Call('_shmemr_mem_detach', PACKAGE = 'shmemr', mem))
+    invisible(.Call(`_shmemr_mem_detach`, mem))
 }
 
 is_mem_attached <- function(mem) {
-    .Call('_shmemr_is_mem_attached', PACKAGE = 'shmemr', mem)
+    .Call(`_shmemr_is_mem_attached`, mem)
 }
 
 get_mem_address <- function(mem) {
-    .Call('_shmemr_get_mem_address', PACKAGE = 'shmemr', mem)
+    .Call(`_shmemr_get_mem_address`, mem)
 }
 
 get_mem_length <- function(mem) {
-    .Call('_shmemr_get_mem_length', PACKAGE = 'shmemr', mem)
+    .Call(`_shmemr_get_mem_length`, mem)
 }
 
 get_mem_id <- function(mem) {
-    .Call('_shmemr_get_mem_id', PACKAGE = 'shmemr', mem)
+    .Call(`_shmemr_get_mem_id`, mem)
 }
 
 mem_remove <- function(mem) {
-    invisible(.Call('_shmemr_mem_remove', PACKAGE = 'shmemr', mem))
+    invisible(.Call(`_shmemr_mem_remove`, mem))
 }
 
 mem_resize <- function(mem, new_length) {
-    invisible(.Call('_shmemr_mem_resize', PACKAGE = 'shmemr', mem, new_length))
+    invisible(.Call(`_shmemr_mem_resize`, mem, new_length))
+}
+
+mem_addr_str <- function(mem) {
+    .Call(`_shmemr_mem_addr_str`, mem)
 }
 

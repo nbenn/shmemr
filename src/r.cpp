@@ -16,6 +16,8 @@
 #include <shmemr/mem.hpp>
 #include <shmemr/utils.hpp>
 
+#include <sstream>
+
 // [[Rcpp::export]]
 SEXP shared_mem_init(std::string name, double length)
 {
@@ -75,4 +77,12 @@ void mem_remove(SEXP mem)
 void mem_resize(SEXP mem, double new_length)
 {
   Rcpp::XPtr<Memory>(mem)->resize(static_cast<uintmax_t>(new_length));
+}
+
+// [[Rcpp::export]]
+std::string mem_addr_str(SEXP mem)
+{
+  std::stringstream ss;
+  ss << Rcpp::XPtr<Memory>(mem)->get_address();
+  return ss.str();
 }
