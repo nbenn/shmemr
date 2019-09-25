@@ -5,27 +5,16 @@
 
 using namespace Rcpp;
 
-// shared_mem_init
-SEXP shared_mem_init(std::string name, double length);
-RcppExport SEXP _shmemr_shared_mem_init(SEXP nameSEXP, SEXP lengthSEXP) {
+// mem_init
+SEXP mem_init(std::string name, double length, std::string type);
+RcppExport SEXP _shmemr_mem_init(SEXP nameSEXP, SEXP lengthSEXP, SEXP typeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type name(nameSEXP);
     Rcpp::traits::input_parameter< double >::type length(lengthSEXP);
-    rcpp_result_gen = Rcpp::wrap(shared_mem_init(name, length));
-    return rcpp_result_gen;
-END_RCPP
-}
-// file_mem_init
-SEXP file_mem_init(std::string name, double length);
-RcppExport SEXP _shmemr_file_mem_init(SEXP nameSEXP, SEXP lengthSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type name(nameSEXP);
-    Rcpp::traits::input_parameter< double >::type length(lengthSEXP);
-    rcpp_result_gen = Rcpp::wrap(file_mem_init(name, length));
+    Rcpp::traits::input_parameter< std::string >::type type(typeSEXP);
+    rcpp_result_gen = Rcpp::wrap(mem_init(name, length, type));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -127,8 +116,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_shmemr_shared_mem_init", (DL_FUNC) &_shmemr_shared_mem_init, 2},
-    {"_shmemr_file_mem_init", (DL_FUNC) &_shmemr_file_mem_init, 2},
+    {"_shmemr_mem_init", (DL_FUNC) &_shmemr_mem_init, 3},
     {"_shmemr_mem_attach", (DL_FUNC) &_shmemr_mem_attach, 1},
     {"_shmemr_mem_detach", (DL_FUNC) &_shmemr_mem_detach, 1},
     {"_shmemr_is_mem_attached", (DL_FUNC) &_shmemr_is_mem_attached, 1},

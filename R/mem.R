@@ -1,68 +1,29 @@
 
-new_mem <- function(name, length, init_fun) {
+#' @export
+new_mem <- function(name, length, type = c("SharedMemory", "FileMemory")) {
 
-  assert_that(is.string(name), is.count(length))
+  type <- match.arg(type)
+
+  assert_that(is.string(name), is.string(type), is.count(length))
 
   length <- as.numeric(length)
 
-  ptr <- init_fun(name, length)
+  ptr <- mem_init(name, length, type)
 
   reg.finalizer(ptr, mem_remove, onexit = TRUE)
 
-  res <- list2env(
-    list(name = name, length = length, ptr_or_null = ptr)
-  )
-
-  makeActiveBinding("ptr", local({
-    env <- res
-    fun <- init_fun
-    function(x) {
-      assert_that(missing(x))
-      if (identical(methods::new("externalptr"), env[["ptr_or_null"]])) {
-        env[["ptr_or_null"]] <- fun(env[["name"]], env[["length"]])
-      }
-      env[["ptr_or_null"]]
-    }}),
-    res
-  )
-
-  structure(res, class = "Memory")
+  structure(ptr, class = c(type, "Memory"))
 }
 
 #' @export
-new_shared_mem <- function(name, length) {
-
-  res <- new_mem(name, length, shared_mem_init)
-  class(res) <- c("SharedMemory", class(res))
-
-  res
-}
-
-#' @export
-new_file_mem <- function(name, length) {
-
-  res <- new_mem(name, length, file_mem_init)
-  class(res) <- c("FileMemory", class(res))
-
-  res
-}
-
-#' @export
-length.Memory <- function(x) {
-  res <- x[["length"]]
-  assert_that(identical(res, get_mem_length(obj_ptr(x))))
-  res
-}
+length.Memory <- get_mem_length
 
 #' @export
 `length<-.Memory` <- function(x, value) {
 
   assert_that(is.count(value))
 
-  length <- as.numeric(value)
-
-  mem_resize(obj_ptr(x), length)
-  x[["length"]] <- length
+  mem_resize(x, as.numeric(value))
 
   invisible(x)
 }
@@ -71,26 +32,25 @@ length.Memory <- function(x) {
 names.Memory <- function(x) name(x)
 
 #' @export
-name <- function(x) {
-  res <- x[["name"]]
-  assert_that(identical(res, get_mem_id(obj_ptr(x))))
-  res
-}
+name <- get_mem_id
 
-#' @export
-obj_ptr <- function(x) x[["ptr"]]
-
-#' @export
-mem_ptr <- function(x) get_mem_address(obj_ptr(x))
+mem_ptr <- get_mem_address
 
 #' @export
 str.Memory <- function(x) {
-  structure(c("name", "length", "ptr"), envir = x, mode = "any",
-            class = "ls_str")
+  len <- big_mark(get_mem_length(x), digits = 0L, format = "f")
+  cat("name:    ", get_mem_id(x), "\n",
+      "length:  ", len, "\n",
+      "address: ", mem_addr_str(x), sep = "")
 }
 
 #' @export
 print.Memory <- function(x) {
-  subcl <- class(x)[which(class(x) == "Memory") - 1L]
-  cat("<", subcl, "[", length(x), "]> ", mem_addr_str(obj_ptr(x)), sep = "")
+  cat("<", class(x)[1L], "[", get_mem_length(x), "]> ", mem_addr_str(x),
+      sep = "")
+}
+
+big_mark <- function(x, ...) {
+  mark <- if (identical(getOption("OutDec"), ",")) "." else ","
+  formatC(x, big.mark = mark, ...)
 }

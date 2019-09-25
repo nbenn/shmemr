@@ -14,75 +14,115 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <shmemr/mem.hpp>
-#include <shmemr/utils.hpp>
 
-#include <sstream>
+#include <Rcpp.h>
 
-// [[Rcpp::export]]
-SEXP shared_mem_init(std::string name, double length)
+Memory* create_mem(std::string name, double length, std::string type)
 {
-  return create_memory<SharedMemory>(name, static_cast<uintmax_t>(length));
+  auto len = static_cast<std::size_t>(length);
+  Memory* res;
+
+  if (type == "SharedMemory")
+  {
+    res = dynamic_cast<Memory*>(new SharedMemory(name, len));
+  }
+  else if (type == "FileMemory")
+  {
+    res = dynamic_cast<Memory*>(new FileMemory(name, len));
+  }
+  else
+  {
+    throw std::runtime_error("Unsupported memory type.");
+  }
+
+  return res;
+}
+
+Rcpp::XPtr<Memory> memptr(SEXP x)
+{
+  auto tag = Rcpp::List(R_ExternalPtrTag(x));
+  auto res = Rcpp::XPtr<Memory>(x, tag);
+
+  if (!res)
+  {
+    auto mem = create_mem(tag["name"], tag["length"], tag["type"]);
+    R_SetExternalPtrAddr(x, mem);
+    auto res = Rcpp::XPtr<Memory>(x, tag);
+  }
+
+  return res;
 }
 
 // [[Rcpp::export]]
-SEXP file_mem_init(std::string name, double length)
+SEXP mem_init(std::string name, double length, std::string type)
 {
-  return create_memory<FileMemory>(name, static_cast<uintmax_t>(length));
+  auto mem = create_mem(name, length, type);
+  auto tag = Rcpp::List::create(
+    Rcpp::Named("name") = Rcpp::wrap(name),
+    Rcpp::Named("length") = Rcpp::wrap(length),
+    Rcpp::Named("type") = Rcpp::wrap(type)
+  );
+
+  return Rcpp::XPtr<Memory>(mem, true, tag);
 }
 
 // [[Rcpp::export]]
-void mem_attach(SEXP mem)
+void mem_attach(SEXP x)
 {
-  Rcpp::XPtr<Memory>(mem)->attach();
+  memptr(x)->attach();
 }
 
 // [[Rcpp::export]]
-void mem_detach(SEXP mem)
+void mem_detach(SEXP x)
 {
-  Rcpp::XPtr<Memory>(mem)->detach();
+  memptr(x)->detach();
 }
 
 // [[Rcpp::export]]
-bool is_mem_attached(SEXP mem)
+bool is_mem_attached(SEXP x)
 {
-  return Rcpp::XPtr<Memory>(mem)->is_attached();
+  return memptr(x)->is_attached();
 }
 
 // [[Rcpp::export]]
-SEXP get_mem_address(SEXP mem)
+SEXP get_mem_address(SEXP x)
 {
-  auto ptr = Rcpp::XPtr<Memory>(mem)->get_address();
+  auto ptr = memptr(x)->get_address();
   return R_MakeExternalPtr(ptr, R_NilValue, R_NilValue);
 }
 
 // [[Rcpp::export]]
-double get_mem_length(SEXP mem)
+double get_mem_length(SEXP x)
 {
-  return static_cast<double>(Rcpp::XPtr<Memory>(mem)->get_size());
+  return static_cast<double>(memptr(x)->get_size());
 }
 
 // [[Rcpp::export]]
-std::string get_mem_id(SEXP mem)
+std::string get_mem_id(SEXP x)
 {
-  return Rcpp::XPtr<Memory>(mem)->get_id();
+  return memptr(x)->get_id();
 }
 
 // [[Rcpp::export]]
-void mem_remove(SEXP mem)
+void mem_remove(SEXP x)
 {
-  Rcpp::XPtr<Memory>(mem)->remove();
+  memptr(x)->remove();
 }
 
 // [[Rcpp::export]]
-void mem_resize(SEXP mem, double new_length)
+void mem_resize(SEXP x, double new_length)
 {
-  Rcpp::XPtr<Memory>(mem)->resize(static_cast<uintmax_t>(new_length));
+  auto tag = Rcpp::List(R_ExternalPtrTag(x));
+  tag["length"] = Rcpp::wrap(new_length);
+  R_SetExternalPtrTag(x, tag);
+
+  memptr(x)->resize(static_cast<std::size_t>(new_length));
 }
 
 // [[Rcpp::export]]
-std::string mem_addr_str(SEXP mem)
+std::string mem_addr_str(SEXP x)
 {
   std::stringstream ss;
-  ss << Rcpp::XPtr<Memory>(mem)->get_address();
+  ss << memptr(x)->get_address();
   return ss.str();
 }
