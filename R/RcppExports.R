@@ -5,39 +5,39 @@ mem_init <- function(name, length, type) {
     .Call(`_shmemr_mem_init`, name, length, type)
 }
 
-mem_attach <- function(mem) {
-    invisible(.Call(`_shmemr_mem_attach`, mem))
+mem_attach <- function(x) {
+    invisible(.Call(`_shmemr_mem_attach`, x))
 }
 
-mem_detach <- function(mem) {
-    invisible(.Call(`_shmemr_mem_detach`, mem))
+mem_detach <- function(x) {
+    invisible(.Call(`_shmemr_mem_detach`, x))
 }
 
-is_mem_attached <- function(mem) {
-    .Call(`_shmemr_is_mem_attached`, mem)
+is_mem_attached <- function(x) {
+    .Call(`_shmemr_is_mem_attached`, x)
 }
 
-get_mem_address <- function(mem) {
-    .Call(`_shmemr_get_mem_address`, mem)
+get_mem_address <- function(x) {
+    .Call(`_shmemr_get_mem_address`, x)
 }
 
-get_mem_length <- function(mem) {
-    .Call(`_shmemr_get_mem_length`, mem)
+get_mem_length <- function(x) {
+    .Call(`_shmemr_get_mem_length`, x)
 }
 
-get_mem_id <- function(mem) {
-    .Call(`_shmemr_get_mem_id`, mem)
+get_mem_id <- function(x) {
+    .Call(`_shmemr_get_mem_id`, x)
 }
 
-mem_remove <- function(mem) {
-    invisible(.Call(`_shmemr_mem_remove`, mem))
+mem_remove <- function(x) {
+    invisible(.Call(`_shmemr_mem_remove`, x))
 }
 
-mem_resize <- function(mem, new_length) {
-    invisible(.Call(`_shmemr_mem_resize`, mem, new_length))
+mem_resize <- function(x, new_length) {
+    invisible(.Call(`_shmemr_mem_resize`, x, new_length))
 }
 
-mem_addr_str <- function(mem) {
-    .Call(`_shmemr_mem_addr_str`, mem)
+mem_addr_str <- function(x) {
+    .Call(`_shmemr_mem_addr_str`, x)
 }
 
