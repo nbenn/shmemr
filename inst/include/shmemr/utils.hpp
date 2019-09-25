@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef INST_INCLUDE_SHMEMR_UTILS_H_
-#define INST_INCLUDE_SHMEMR_UTILS_H_
+#ifndef INST_INCLUDE_SHMEMR_UTILS_HPP_
+#define INST_INCLUDE_SHMEMR_UTILS_HPP_
 
 #include <Rcpp.h>
 
@@ -29,4 +29,4 @@ SEXP create_memory(Ar&&... rg)
   return Rcpp::XPtr<Memory>(dynamic_cast<Memory*>(mem), true);
 }
 
-#endif  // INST_INCLUDE_SHMEMR_UTILS_H_
+#endif  // INST_INCLUDE_SHMEMR_UTILS_HPP_

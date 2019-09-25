@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef INST_INCLUDE_SHMEMR_MEM_H_
-#define INST_INCLUDE_SHMEMR_MEM_H_
+#ifndef INST_INCLUDE_SHMEMR_MEM_HPP_
+#define INST_INCLUDE_SHMEMR_MEM_HPP_
 
 #include <string>
 
@@ -30,12 +30,12 @@ public:
   virtual bool is_attached() = 0;
 
   virtual void* get_address() = 0;
-  virtual uintmax_t get_size() = 0;
+  virtual std::size_t get_size() = 0;
   virtual std::string get_id() = 0;
 
   virtual void remove() = 0;
 
-  virtual void resize(uintmax_t) = 0;
+  virtual void resize(std::size_t) = 0;
 
   virtual ~Memory() {}
 };
@@ -44,19 +44,19 @@ class SharedMemory: public Memory
 {
 public:
   SharedMemory() = default;
-  SharedMemory(std::string, uintmax_t);
+  SharedMemory(std::string, std::size_t);
 
   void attach();
   void detach();
   bool is_attached();
 
   void* get_address();
-  uintmax_t get_size();
+  std::size_t get_size();
   std::string get_id();
 
   void remove();
 
-  void resize(uintmax_t);
+  void resize(std::size_t);
 
 private:
   boost::interprocess::shared_memory_object mem;
@@ -67,19 +67,19 @@ class FileMemory: public Memory
 {
 public:
   FileMemory() = default;
-  FileMemory(std::string, uintmax_t);
+  FileMemory(std::string, std::size_t);
 
   void attach();
   void detach();
   bool is_attached();
 
   void* get_address();
-  uintmax_t get_size();
+  std::size_t get_size();
   std::string get_id();
 
   void remove();
 
-  void resize(uintmax_t);
+  void resize(std::size_t);
 
 private:
   boost::interprocess::file_mapping mem;
@@ -89,8 +89,8 @@ private:
 };
 
 bool file_is_accessible(std::string);
-uintmax_t file_size(std::string);
+std::size_t file_size(std::string);
 void create_file(std::string);
-void resize_file(std::string, uintmax_t);
+void resize_file(std::string, std::size_t);
 
-#endif  // INST_INCLUDE_SHMEMR_MEM_H_
+#endif  // INST_INCLUDE_SHMEMR_MEM_HPP_
