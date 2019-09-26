@@ -56,12 +56,19 @@ SharedMemory::SharedMemory(std::string id, std::size_t length)
         "the requested size.");
   }
 
-  map = bip::mapped_region(mem, bip::read_write);
+  if (get_size() > 0)
+  {
+    map = bip::mapped_region(mem, bip::read_write);
+  }
+  else
+  {
+    map = bip::mapped_region();
+  }
 }
 
 void SharedMemory::attach()
 {
-  if (!is_attached())
+  if (!is_attached() && get_size() > 0)
   {
     map = bip::mapped_region(mem, bip::read_write);
   }
@@ -143,12 +150,20 @@ FileMemory::FileMemory(std::string file_path, std::size_t length)
   }
 
   mem = bip::file_mapping(file_path.c_str(), bip::read_write);
-  map = bip::mapped_region(mem, bip::read_write);
+
+  if (get_size() > 0)
+  {
+    map = bip::mapped_region(mem, bip::read_write);
+  }
+  else
+  {
+    map = bip::mapped_region();
+  }
 }
 
 void FileMemory::attach()
 {
-  if (!is_attached())
+  if (!is_attached() && get_size() > 0)
   {
     map = bip::mapped_region(mem, bip::read_write);
   }
@@ -229,7 +244,9 @@ void create_file(std::string file_path)
     throw std::runtime_error("File already exists.");
   }
 
-  std::ofstream outfile(file_path);
+  std::ofstream outfile;
+  outfile.open(file_path, std::ofstream::out);
+  outfile.close();
 }
 
 void resize_file(std::string file_path, std::size_t new_size)
