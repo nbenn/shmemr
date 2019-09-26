@@ -28,17 +28,25 @@ length.Memory <- get_mem_length
 }
 
 #' @export
-names.Memory <- function(x) name(x)
+names.Memory <- function(x) get_mem_id(x)
 
 #' @export
-name <- get_mem_id
+name <- function(x) {
+  assert_that(is_mem(x))
+  get_mem_id(x)
+}
 
-mem_ptr <- get_mem_address
+#' @export
+mem_ptr <- function(x) {
+  assert_that(is_mem(x))
+  get_mem_address(x)
+}
 
 #' @export
 str.Memory <- function(x, ...) {
   len <- big_mark(get_mem_length(x), digits = 0L, format = "f")
-  cat("name:    ", get_mem_id(x), "\n",
+  cat("<Memory>\n",
+      "name:    ", get_mem_id(x), "\n",
       "length:  ", len, "\n",
       "address: ", mem_addr_str(x), "\n",
       "type:    ", class(x)[1L], "\n", sep = "")
@@ -63,3 +71,6 @@ rand_name <- function(length = 15L, chars = c(letters, LETTERS, 0L:9L)) {
 
   paste(sample(chars, length, replace = TRUE), collapse = "")
 }
+
+#' @export
+is_mem <- function(x) inherits(x, "Memory")
