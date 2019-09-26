@@ -13,9 +13,7 @@
 // You should have received a copy of the GNU General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <shmemr/mem.hpp>
-
-#include <Rcpp.h>
+#include <shmemr/r.hpp>
 
 Memory* create_mem(std::string name, double length, std::string type)
 {
@@ -48,20 +46,26 @@ Rcpp::XPtr<Memory> memptr(SEXP x)
     auto mem = create_mem(tag["name"], tag["length"], tag["type"]);
     R_SetExternalPtrAddr(x, mem);
     auto res = Rcpp::XPtr<Memory>(x, tag);
+    res.setDeleteFinalizer();
   }
 
   return res;
+}
+
+Rcpp::List create_tag(std::string name, double length, std::string type)
+{
+  return Rcpp::List::create(
+    Rcpp::Named("name") = Rcpp::wrap(name),
+    Rcpp::Named("length") = Rcpp::wrap(length),
+    Rcpp::Named("type") = Rcpp::wrap(type)
+  );
 }
 
 // [[Rcpp::export]]
 SEXP mem_init(std::string name, double length, std::string type)
 {
   auto mem = create_mem(name, length, type);
-  auto tag = Rcpp::List::create(
-    Rcpp::Named("name") = Rcpp::wrap(name),
-    Rcpp::Named("length") = Rcpp::wrap(length),
-    Rcpp::Named("type") = Rcpp::wrap(type)
-  );
+  auto tag = create_tag(name, length, type);
 
   return Rcpp::XPtr<Memory>(mem, true, tag);
 }
@@ -84,11 +88,15 @@ bool is_mem_attached(SEXP x)
   return memptr(x)->is_attached();
 }
 
+void* get_mem_pointer(SEXP x)
+{
+  return memptr(x)->get_address();
+}
+
 // [[Rcpp::export]]
 SEXP get_mem_address(SEXP x)
 {
-  auto ptr = memptr(x)->get_address();
-  return R_MakeExternalPtr(ptr, R_NilValue, R_NilValue);
+  return R_MakeExternalPtr(get_mem_pointer(x), R_NilValue, R_NilValue);
 }
 
 // [[Rcpp::export]]
