@@ -41,3 +41,7 @@ mem_addr_str <- function(x) {
     .Call(`_shmemr_mem_addr_str`, x)
 }
 
+# Register entry points for exported C++ functions
+methods::setLoadAction(function(ns) {
+    .Call('_shmemr_RcppExport_registerCCallable', PACKAGE = 'shmemr')
+})

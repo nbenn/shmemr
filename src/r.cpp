@@ -13,7 +13,11 @@
 // You should have received a copy of the GNU General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <shmemr/r.hpp>
+#include <shmemr/mem.hpp>
+
+#include <Rcpp.h>
+
+// [[Rcpp::interfaces(r, cpp)]]
 
 Memory* create_mem(std::string name, double length, std::string type)
 {
@@ -88,15 +92,10 @@ bool is_mem_attached(SEXP x)
   return memptr(x)->is_attached();
 }
 
-void* get_mem_pointer(SEXP x)
-{
-  return memptr(x)->get_address();
-}
-
 // [[Rcpp::export]]
 SEXP get_mem_address(SEXP x)
 {
-  return R_MakeExternalPtr(get_mem_pointer(x), R_NilValue, R_NilValue);
+  return R_MakeExternalPtr(memptr(x)->get_address(), R_NilValue, R_NilValue);
 }
 
 // [[Rcpp::export]]
