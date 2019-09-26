@@ -36,16 +36,16 @@ name <- get_mem_id
 mem_ptr <- get_mem_address
 
 #' @export
-str.Memory <- function(x) {
+str.Memory <- function(x, ...) {
   len <- big_mark(get_mem_length(x), digits = 0L, format = "f")
   cat("name:    ", get_mem_id(x), "\n",
       "length:  ", len, "\n",
-      "address: ", mem_addr_str(x),
-      "type:    ", class(x)[1L], sep = "")
+      "address: ", mem_addr_str(x), "\n",
+      "type:    ", class(x)[1L], "\n", sep = "")
 }
 
 #' @export
-print.Memory <- function(x) {
+print.Memory <- function(x, ...) {
   cat("<", class(x)[1L], "[", get_mem_length(x), "]> ", mem_addr_str(x),
       sep = "")
 }
