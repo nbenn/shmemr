@@ -5,11 +5,9 @@ new_mem <- function(length, name = rand_name(),
 
   type <- match.arg(type)
 
-  assert_that(is.string(name), is.string(type), is.count(length))
+  assert_that(is_string(name), is_string(type), is_count(length))
 
-  length <- as.numeric(length)
-
-  ptr <- mem_init(name, length, type)
+  ptr <- mem_init(name, as.numeric(length), type)
 
   reg.finalizer(ptr, mem_remove, onexit = TRUE)
 
@@ -22,7 +20,7 @@ length.Memory <- get_mem_length
 #' @export
 `length<-.Memory` <- function(x, value) {
 
-  assert_that(is.count(value))
+  assert_that(is_count(value))
 
   mem_resize(x, as.numeric(value))
 
@@ -60,7 +58,7 @@ big_mark <- function(x, ...) {
 rand_name <- function(length = 15L, chars = c(letters, LETTERS, 0L:9L)) {
 
   assert_that(
-    is.count(length), is.character(chars), length(chars) >= 1L
+    is_count(length), is.character(chars), length(chars) >= 1L
   )
 
   paste(sample(chars, length, replace = TRUE), collapse = "")
