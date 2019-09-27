@@ -24,11 +24,11 @@ namespace shmemr {
         }
     }
 
-    inline SEXP mem_init(std::string name, double length, std::string type) {
+    inline Rcpp::List mem_init(std::string name, double length, std::string type) {
         typedef SEXP(*Ptr_mem_init)(SEXP,SEXP,SEXP);
         static Ptr_mem_init p_mem_init = NULL;
         if (p_mem_init == NULL) {
-            validateSignature("SEXP(*mem_init)(std::string,double,std::string)");
+            validateSignature("Rcpp::List(*mem_init)(std::string,double,std::string)");
             p_mem_init = (Ptr_mem_init)R_GetCCallable("shmemr", "_shmemr_mem_init");
         }
         RObject rcpp_result_gen;
@@ -42,7 +42,7 @@ namespace shmemr {
             throw Rcpp::LongjumpException(rcpp_result_gen);
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
-        return Rcpp::as<SEXP >(rcpp_result_gen);
+        return Rcpp::as<Rcpp::List >(rcpp_result_gen);
     }
 
     inline void mem_attach(SEXP x) {
@@ -106,17 +106,17 @@ namespace shmemr {
         return Rcpp::as<bool >(rcpp_result_gen);
     }
 
-    inline SEXP get_mem_address(SEXP x) {
-        typedef SEXP(*Ptr_get_mem_address)(SEXP);
-        static Ptr_get_mem_address p_get_mem_address = NULL;
-        if (p_get_mem_address == NULL) {
-            validateSignature("SEXP(*get_mem_address)(SEXP)");
-            p_get_mem_address = (Ptr_get_mem_address)R_GetCCallable("shmemr", "_shmemr_get_mem_address");
+    inline SEXP get_mem_ptr(SEXP x) {
+        typedef SEXP(*Ptr_get_mem_ptr)(SEXP);
+        static Ptr_get_mem_ptr p_get_mem_ptr = NULL;
+        if (p_get_mem_ptr == NULL) {
+            validateSignature("SEXP(*get_mem_ptr)(SEXP)");
+            p_get_mem_ptr = (Ptr_get_mem_ptr)R_GetCCallable("shmemr", "_shmemr_get_mem_ptr");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_get_mem_address(Shield<SEXP>(Rcpp::wrap(x)));
+            rcpp_result_gen = p_get_mem_ptr(Shield<SEXP>(Rcpp::wrap(x)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
@@ -125,6 +125,27 @@ namespace shmemr {
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
         return Rcpp::as<SEXP >(rcpp_result_gen);
+    }
+
+    inline std::string get_mem_str(SEXP x) {
+        typedef SEXP(*Ptr_get_mem_str)(SEXP);
+        static Ptr_get_mem_str p_get_mem_str = NULL;
+        if (p_get_mem_str == NULL) {
+            validateSignature("std::string(*get_mem_str)(SEXP)");
+            p_get_mem_str = (Ptr_get_mem_str)R_GetCCallable("shmemr", "_shmemr_get_mem_str");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_get_mem_str(Shield<SEXP>(Rcpp::wrap(x)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<std::string >(rcpp_result_gen);
     }
 
     inline double get_mem_length(SEXP x) {
@@ -207,27 +228,6 @@ namespace shmemr {
             throw Rcpp::LongjumpException(rcpp_result_gen);
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
-    }
-
-    inline std::string mem_addr_str(SEXP x) {
-        typedef SEXP(*Ptr_mem_addr_str)(SEXP);
-        static Ptr_mem_addr_str p_mem_addr_str = NULL;
-        if (p_mem_addr_str == NULL) {
-            validateSignature("std::string(*mem_addr_str)(SEXP)");
-            p_mem_addr_str = (Ptr_mem_addr_str)R_GetCCallable("shmemr", "_shmemr_mem_addr_str");
-        }
-        RObject rcpp_result_gen;
-        {
-            RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_mem_addr_str(Shield<SEXP>(Rcpp::wrap(x)));
-        }
-        if (rcpp_result_gen.inherits("interrupted-error"))
-            throw Rcpp::internal::InterruptedException();
-        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
-            throw Rcpp::LongjumpException(rcpp_result_gen);
-        if (rcpp_result_gen.inherits("try-error"))
-            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
-        return Rcpp::as<std::string >(rcpp_result_gen);
     }
 
 }

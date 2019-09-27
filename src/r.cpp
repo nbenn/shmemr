@@ -46,25 +46,25 @@ Memory* create_mem(std::string name, double length, std::string type)
 
 Rcpp::XPtr<Memory> memptr(SEXP x)
 {
-  shmemr_debug("Using external pointer at <%p>\n", (void *)x);
+  auto lst = Rcpp::List(x);
+  SEXP ptr = lst["ptr"];
 
-  if (TYPEOF(x) != EXTPTRSXP)
+  shmemr_debug("Using external pointer at <%p>\n", (void *)ptr);
+
+  if (TYPEOF(ptr) != EXTPTRSXP)
   {
     std::runtime_error("Expecting an external pointer.");
   }
 
-  auto tag = Rcpp::List(R_ExternalPtrTag(x));
-  auto res = Rcpp::XPtr<Memory>(x, tag);
+  auto res = Rcpp::XPtr<Memory>(ptr);
 
   if (!res)
   {
     shmemr_debug("%s\n", "Recreating external pointer");
 
-    auto mem = create_mem(tag["name"], tag["length"], tag["type"]);
-    R_SetExternalPtrAddr(x, mem);
-
-    auto res = Rcpp::XPtr<Memory>(x, tag);
-    res.setDeleteFinalizer();
+    auto mem = create_mem(lst["name"], lst["length"], lst["type"]);
+    auto res = Rcpp::XPtr<Memory>(mem, true);
+    lst["ptr"] = Rcpp::wrap(res);
   }
   else
   {
@@ -74,22 +74,18 @@ Rcpp::XPtr<Memory> memptr(SEXP x)
   return res;
 }
 
-Rcpp::List create_tag(std::string name, double length, std::string type)
+// [[Rcpp::export]]
+Rcpp::List mem_init(std::string name, double length, std::string type)
 {
+  auto mem = create_mem(name, length, type);
+  auto ptr = Rcpp::XPtr<Memory>(mem, true);
+
   return Rcpp::List::create(
     Rcpp::Named("name") = Rcpp::wrap(name),
     Rcpp::Named("length") = Rcpp::wrap(length),
-    Rcpp::Named("type") = Rcpp::wrap(type)
+    Rcpp::Named("type") = Rcpp::wrap(type),
+    Rcpp::Named("ptr") = Rcpp::wrap(ptr)
   );
-}
-
-// [[Rcpp::export]]
-SEXP mem_init(std::string name, double length, std::string type)
-{
-  auto mem = create_mem(name, length, type);
-  auto tag = create_tag(name, length, type);
-
-  return Rcpp::XPtr<Memory>(mem, true, tag);
 }
 
 // [[Rcpp::export]]
@@ -111,9 +107,17 @@ bool is_mem_attached(SEXP x)
 }
 
 // [[Rcpp::export]]
-SEXP get_mem_address(SEXP x)
+SEXP get_mem_ptr(SEXP x)
 {
   return R_MakeExternalPtr(memptr(x)->get_address(), R_NilValue, R_NilValue);
+}
+
+// [[Rcpp::export]]
+std::string get_mem_str(SEXP x)
+{
+  std::stringstream ss;
+  ss << memptr(x)->get_address();
+  return ss.str();
 }
 
 // [[Rcpp::export]]
@@ -142,12 +146,4 @@ void mem_resize(SEXP x, double new_length)
   R_SetExternalPtrTag(x, tag);
 
   memptr(x)->resize(static_cast<std::size_t>(new_length));
-}
-
-// [[Rcpp::export]]
-std::string mem_addr_str(SEXP x)
-{
-  std::stringstream ss;
-  ss << memptr(x)->get_address();
-  return ss.str();
 }

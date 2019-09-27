@@ -7,11 +7,11 @@ new_mem <- function(length, name = rand_name(),
 
   assert_that(is_string(name), is_string(type), is_count(length))
 
-  ptr <- mem_init(name, as.numeric(length), type)
+  res <- mem_init(name, as.numeric(length), type)
 
-  reg.finalizer(ptr, mem_remove, onexit = TRUE)
+  reg.finalizer(res[["ptr"]], mem_remove, onexit = TRUE)
 
-  structure(ptr, class = c(type, "Memory"))
+  structure(res, class = c(type, "Memory"))
 }
 
 #' @export
@@ -39,7 +39,7 @@ name <- function(x) {
 #' @export
 mem_ptr <- function(x) {
   assert_that(is_mem(x))
-  get_mem_address(x)
+  get_mem_ptr(x)
 }
 
 #' @export
@@ -48,12 +48,12 @@ str.Memory <- function(x, ...) {
   cat("<Memory>\n",
       "name:    ", get_mem_id(x), "\n",
       "length:  ", len, "\n",
-      "address: ", mem_addr_str(x), "\n",
+      "address: ", get_mem_str(x), "\n",
       "type:    ", class(x)[1L], "\n", sep = "")
 }
 
 #' @export
 print.Memory <- function(x, ...) {
   len <- big_mark(get_mem_length(x), digits = 0L, format = "f")
-  cat("<", class(x)[1L], "[", len, "]> ", mem_addr_str(x), "\n", sep = "")
+  cat("<", class(x)[1L], "[", len, "]> ", get_mem_str(x), "\n", sep = "")
 }

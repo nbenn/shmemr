@@ -9,7 +9,7 @@
 using namespace Rcpp;
 
 // mem_init
-SEXP mem_init(std::string name, double length, std::string type);
+Rcpp::List mem_init(std::string name, double length, std::string type);
 static SEXP _shmemr_mem_init_try(SEXP nameSEXP, SEXP lengthSEXP, SEXP typeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -144,21 +144,55 @@ RcppExport SEXP _shmemr_is_mem_attached(SEXP xSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// get_mem_address
-SEXP get_mem_address(SEXP x);
-static SEXP _shmemr_get_mem_address_try(SEXP xSEXP) {
+// get_mem_ptr
+SEXP get_mem_ptr(SEXP x);
+static SEXP _shmemr_get_mem_ptr_try(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(get_mem_address(x));
+    rcpp_result_gen = Rcpp::wrap(get_mem_ptr(x));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _shmemr_get_mem_address(SEXP xSEXP) {
+RcppExport SEXP _shmemr_get_mem_ptr(SEXP xSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_shmemr_get_mem_address_try(xSEXP));
+        rcpp_result_gen = PROTECT(_shmemr_get_mem_ptr_try(xSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// get_mem_str
+std::string get_mem_str(SEXP x);
+static SEXP _shmemr_get_mem_str_try(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_mem_str(x));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _shmemr_get_mem_str(SEXP xSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_shmemr_get_mem_str_try(xSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -313,55 +347,21 @@ RcppExport SEXP _shmemr_mem_resize(SEXP xSEXP, SEXP new_lengthSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// mem_addr_str
-std::string mem_addr_str(SEXP x);
-static SEXP _shmemr_mem_addr_str_try(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(mem_addr_str(x));
-    return rcpp_result_gen;
-END_RCPP_RETURN_ERROR
-}
-RcppExport SEXP _shmemr_mem_addr_str(SEXP xSEXP) {
-    SEXP rcpp_result_gen;
-    {
-        Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_shmemr_mem_addr_str_try(xSEXP));
-    }
-    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
-    if (rcpp_isInterrupt_gen) {
-        UNPROTECT(1);
-        Rf_onintr();
-    }
-    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
-    if (rcpp_isLongjump_gen) {
-        Rcpp::internal::resumeJump(rcpp_result_gen);
-    }
-    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
-    if (rcpp_isError_gen) {
-        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
-        UNPROTECT(1);
-        Rf_error(CHAR(rcpp_msgSEXP_gen));
-    }
-    UNPROTECT(1);
-    return rcpp_result_gen;
-}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _shmemr_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
-        signatures.insert("SEXP(*mem_init)(std::string,double,std::string)");
+        signatures.insert("Rcpp::List(*mem_init)(std::string,double,std::string)");
         signatures.insert("void(*mem_attach)(SEXP)");
         signatures.insert("void(*mem_detach)(SEXP)");
         signatures.insert("bool(*is_mem_attached)(SEXP)");
-        signatures.insert("SEXP(*get_mem_address)(SEXP)");
+        signatures.insert("SEXP(*get_mem_ptr)(SEXP)");
+        signatures.insert("std::string(*get_mem_str)(SEXP)");
         signatures.insert("double(*get_mem_length)(SEXP)");
         signatures.insert("std::string(*get_mem_id)(SEXP)");
         signatures.insert("void(*mem_remove)(SEXP)");
         signatures.insert("void(*mem_resize)(SEXP,double)");
-        signatures.insert("std::string(*mem_addr_str)(SEXP)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -372,12 +372,12 @@ RcppExport SEXP _shmemr_RcppExport_registerCCallable() {
     R_RegisterCCallable("shmemr", "_shmemr_mem_attach", (DL_FUNC)_shmemr_mem_attach_try);
     R_RegisterCCallable("shmemr", "_shmemr_mem_detach", (DL_FUNC)_shmemr_mem_detach_try);
     R_RegisterCCallable("shmemr", "_shmemr_is_mem_attached", (DL_FUNC)_shmemr_is_mem_attached_try);
-    R_RegisterCCallable("shmemr", "_shmemr_get_mem_address", (DL_FUNC)_shmemr_get_mem_address_try);
+    R_RegisterCCallable("shmemr", "_shmemr_get_mem_ptr", (DL_FUNC)_shmemr_get_mem_ptr_try);
+    R_RegisterCCallable("shmemr", "_shmemr_get_mem_str", (DL_FUNC)_shmemr_get_mem_str_try);
     R_RegisterCCallable("shmemr", "_shmemr_get_mem_length", (DL_FUNC)_shmemr_get_mem_length_try);
     R_RegisterCCallable("shmemr", "_shmemr_get_mem_id", (DL_FUNC)_shmemr_get_mem_id_try);
     R_RegisterCCallable("shmemr", "_shmemr_mem_remove", (DL_FUNC)_shmemr_mem_remove_try);
     R_RegisterCCallable("shmemr", "_shmemr_mem_resize", (DL_FUNC)_shmemr_mem_resize_try);
-    R_RegisterCCallable("shmemr", "_shmemr_mem_addr_str", (DL_FUNC)_shmemr_mem_addr_str_try);
     R_RegisterCCallable("shmemr", "_shmemr_RcppExport_validate", (DL_FUNC)_shmemr_RcppExport_validate);
     return R_NilValue;
 }
@@ -387,12 +387,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_shmemr_mem_attach", (DL_FUNC) &_shmemr_mem_attach, 1},
     {"_shmemr_mem_detach", (DL_FUNC) &_shmemr_mem_detach, 1},
     {"_shmemr_is_mem_attached", (DL_FUNC) &_shmemr_is_mem_attached, 1},
-    {"_shmemr_get_mem_address", (DL_FUNC) &_shmemr_get_mem_address, 1},
+    {"_shmemr_get_mem_ptr", (DL_FUNC) &_shmemr_get_mem_ptr, 1},
+    {"_shmemr_get_mem_str", (DL_FUNC) &_shmemr_get_mem_str, 1},
     {"_shmemr_get_mem_length", (DL_FUNC) &_shmemr_get_mem_length, 1},
     {"_shmemr_get_mem_id", (DL_FUNC) &_shmemr_get_mem_id, 1},
     {"_shmemr_mem_remove", (DL_FUNC) &_shmemr_mem_remove, 1},
     {"_shmemr_mem_resize", (DL_FUNC) &_shmemr_mem_resize, 2},
-    {"_shmemr_mem_addr_str", (DL_FUNC) &_shmemr_mem_addr_str, 1},
     {"_shmemr_RcppExport_registerCCallable", (DL_FUNC) &_shmemr_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}
 };

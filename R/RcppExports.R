@@ -17,8 +17,12 @@ is_mem_attached <- function(x) {
     .Call(`_shmemr_is_mem_attached`, x)
 }
 
-get_mem_address <- function(x) {
-    .Call(`_shmemr_get_mem_address`, x)
+get_mem_ptr <- function(x) {
+    .Call(`_shmemr_get_mem_ptr`, x)
+}
+
+get_mem_str <- function(x) {
+    .Call(`_shmemr_get_mem_str`, x)
 }
 
 get_mem_length <- function(x) {
@@ -35,10 +39,6 @@ mem_remove <- function(x) {
 
 mem_resize <- function(x, new_length) {
     invisible(.Call(`_shmemr_mem_resize`, x, new_length))
-}
-
-mem_addr_str <- function(x) {
-    .Call(`_shmemr_mem_addr_str`, x)
 }
 
 # Register entry points for exported C++ functions
