@@ -63,7 +63,7 @@ Rcpp::XPtr<Memory> memptr(SEXP x)
     shmemr_debug("%s\n", "Recreating external pointer");
 
     auto mem = create_mem(lst["name"], lst["length"], lst["type"]);
-    auto res = Rcpp::XPtr<Memory>(mem, true);
+    res = Rcpp::XPtr<Memory>(mem, true);
     lst["ptr"] = Rcpp::wrap(res);
   }
   else
@@ -135,15 +135,16 @@ std::string get_mem_id(SEXP x)
 // [[Rcpp::export]]
 void mem_remove(SEXP x)
 {
-  memptr(x)->remove();
+  auto ptr = memptr(x);
+  shmemr_debug("Deleting memory segment at <%p>", ptr->get_address());
+  ptr->remove();
 }
 
 // [[Rcpp::export]]
 void mem_resize(SEXP x, double new_length)
 {
-  auto tag = Rcpp::List(R_ExternalPtrTag(x));
-  tag["length"] = Rcpp::wrap(new_length);
-  R_SetExternalPtrTag(x, tag);
+  auto lst = Rcpp::List(x);
+  lst["length"] = Rcpp::wrap(new_length);
 
   memptr(x)->resize(static_cast<std::size_t>(new_length));
 }

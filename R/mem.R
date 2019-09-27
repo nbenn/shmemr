@@ -1,17 +1,26 @@
 
 #' @export
 new_mem <- function(length, name = rand_name(),
-                    type = c("SharedMemory", "FileMemory")) {
+                    type = c("SharedMemory", "FileMemory"),
+                    auto_cleanup = TRUE) {
+
+  cleanup <- function(mem) {
+    reg.finalizer(environment(), function(x) mem_remove(mem), onexit = TRUE)
+    environment()
+  }
 
   type <- match.arg(type)
 
   assert_that(is_string(name), is_string(type), is_count(length))
 
-  res <- mem_init(name, as.numeric(length), type)
+  res <- structure(mem_init(name, as.numeric(length), type),
+                   class = c(type, "Memory"))
 
-  reg.finalizer(res[["ptr"]], mem_remove, onexit = TRUE)
+  if (auto_cleanup) {
+    attr(res, "finalizer") <- cleanup(res)
+  }
 
-  structure(res, class = c(type, "Memory"))
+  res
 }
 
 #' @export
