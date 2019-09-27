@@ -54,23 +54,6 @@ str.Memory <- function(x, ...) {
 
 #' @export
 print.Memory <- function(x, ...) {
-  cat("<", class(x)[1L], "[", get_mem_length(x), "]> ", mem_addr_str(x),
-      sep = "")
+  len <- big_mark(get_mem_length(x), digits = 0L, format = "f")
+  cat("<", class(x)[1L], "[", len, "]> ", mem_addr_str(x), "\n", sep = "")
 }
-
-big_mark <- function(x, ...) {
-  mark <- if (identical(getOption("OutDec"), ",")) "." else ","
-  formatC(x, big.mark = mark, ...)
-}
-
-rand_name <- function(length = 15L, chars = c(letters, LETTERS, 0L:9L)) {
-
-  assert_that(
-    is_count(length), is.character(chars), length(chars) >= 1L
-  )
-
-  paste(sample(chars, length, replace = TRUE), collapse = "")
-}
-
-#' @export
-is_mem <- function(x) inherits(x, "Memory")

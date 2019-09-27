@@ -13,7 +13,8 @@
 // You should have received a copy of the GNU General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include <shmemr/mem.hpp>
+#include <shmemr/mem.h>
+#include <shmemr/utils.h>
 
 #include <Rcpp.h>
 
@@ -37,20 +38,37 @@ Memory* create_mem(std::string name, double length, std::string type)
     throw std::runtime_error("Unsupported memory type.");
   }
 
+  shmemr_debug("Successfully created %s object <%s[%.0f]>\n",
+               type.c_str(), name.c_str(), length);
+
   return res;
 }
 
 Rcpp::XPtr<Memory> memptr(SEXP x)
 {
+  shmemr_debug("Using external pointer at <%p>\n", (void *)x);
+
+  if (TYPEOF(x) != EXTPTRSXP)
+  {
+    std::runtime_error("Expecting an external pointer.");
+  }
+
   auto tag = Rcpp::List(R_ExternalPtrTag(x));
   auto res = Rcpp::XPtr<Memory>(x, tag);
 
   if (!res)
   {
+    shmemr_debug("%s\n", "Recreating external pointer");
+
     auto mem = create_mem(tag["name"], tag["length"], tag["type"]);
     R_SetExternalPtrAddr(x, mem);
+
     auto res = Rcpp::XPtr<Memory>(x, tag);
     res.setDeleteFinalizer();
+  }
+  else
+  {
+    shmemr_debug("%s\n", "Reusing existing external pointer");
   }
 
   return res;
