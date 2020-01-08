@@ -8,8 +8,15 @@ new_mem <- function(length, name = rand_name(),
 
   assert_that(is_string(name), is_string(type), is_count(length))
 
-  structure(mem_init(name, as.numeric(length), type),
-            class = c(type, "Memory"))
+  res <- mem_init(name, as.numeric(length), type)
+
+  class(res) <- c(type, "Memory")
+
+  if (auto_cleanup) {
+    reg.finalizer(.subset2(res, "ptr"), mem_release, onexit = TRUE)
+  }
+
+  res
 }
 
 #' @export

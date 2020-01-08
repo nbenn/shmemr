@@ -21,59 +21,10 @@
 
 // [[Rcpp::interfaces(r, cpp)]]
 
-static SEXP mem_list = NULL;
-
 template <typename T>
 Rcpp::XPtr<T> xptr(SEXP x)
 {
   return Rcpp::XPtr<T>(x, R_ExternalPtrTag(x), R_ExternalPtrProtected(x));
-}
-
-static void mem_finalize(SEXP eptr)
-{
-  void* vptr = R_ExternalPtrAddr(eptr);
-
-  if (vptr != NULL)
-  {
-    auto mptr = static_cast<Memory*>(vptr);
-
-    shmemr_debug("Finalizing memory segment %s<%p>", mptr->get_id().c_str(),
-        mptr->get_address());
-
-    mptr->remove();
-    R_SetExternalPtrAddr(eptr, NULL);
-  }
-}
-
-static void register_mem_eptr(SEXP eptr)
-{
-  if (mem_list == NULL)
-  {
-    mem_list = Rf_cons(R_NilValue, R_NilValue);
-    R_PreserveObject(mem_list);
-  }
-
-  SETCDR(
-    mem_list,
-    Rf_cons(
-      R_MakeWeakRefC(eptr, R_NilValue, mem_finalize, TRUE),
-      CDR(mem_list)
-    )
-  );
-
-  R_SetExternalPtrTag(eptr, CAR(CDR(mem_list)));
-}
-
-static void finalize_mem_objects()
-{
-  if (mem_list != NULL)
-  {
-    for (SEXP next = CDR(mem_list); next != R_NilValue; next = CDR(next))
-    {
-      R_RunWeakRefFinalizer(CAR(next));
-    }
-    R_ReleaseObject(mem_list);
-  }
 }
 
 Memory* create_mem(std::string name, double length, std::string type)
@@ -129,15 +80,34 @@ Rcpp::XPtr<Memory> memptr(SEXP x)
 Rcpp::List mem_init(std::string name, double length, std::string type)
 {
   auto mem = create_mem(name, length, type);
-  auto ptr = Rcpp::wrap(Rcpp::XPtr<Memory>(mem, true));
-  register_mem_eptr(ptr);
+  auto ptr = Rcpp::XPtr<Memory>(mem, true);
 
   return Rcpp::List::create(
     Rcpp::Named("name") = Rcpp::wrap(name),
     Rcpp::Named("length") = Rcpp::wrap(length),
     Rcpp::Named("type") = Rcpp::wrap(type),
-    Rcpp::Named("ptr") = ptr
+    Rcpp::Named("ptr") = Rcpp::wrap(ptr)
   );
+}
+
+// [[Rcpp::export]]
+void mem_release(SEXP x)
+{
+
+  if (TYPEOF(x) != EXTPTRSXP)
+  {
+    std::runtime_error("Expecting an external pointer.");
+  }
+
+  auto ptr = xptr<Memory>(x);
+
+  if (ptr)
+  {
+    shmemr_debug("Releasing memory segment %s<%p>", ptr->get_id().c_str(),
+        ptr->get_address());
+
+    ptr->remove();
+  }
 }
 
 // [[Rcpp::export]]
@@ -189,7 +159,7 @@ void mem_remove(SEXP x)
 {
   auto ptr = memptr(x);
 
-  shmemr_debug("Deleting memory segment %s<%p>", ptr->get_id().c_str(),
+  shmemr_debug("Releasing memory segment %s<%p>", ptr->get_id().c_str(),
       ptr->get_address());
 
   ptr->remove();
@@ -208,9 +178,4 @@ void mem_resize(SEXP x, double new_length)
   lst["length"] = Rcpp::wrap(new_length);
 
   ptr->resize(static_cast<std::size_t>(new_length));
-}
-
-void R_unload_shmemr(DllInfo *dll)
-{
-    finalize_mem_objects();
 }

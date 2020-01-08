@@ -5,6 +5,10 @@ mem_init <- function(name, length, type) {
     .Call(`_shmemr_mem_init`, name, length, type)
 }
 
+mem_release <- function(x) {
+    invisible(.Call(`_shmemr_mem_release`, x))
+}
+
 mem_attach <- function(x) {
     invisible(.Call(`_shmemr_mem_attach`, x))
 }

@@ -45,6 +45,26 @@ namespace shmemr {
         return Rcpp::as<Rcpp::List >(rcpp_result_gen);
     }
 
+    inline void mem_release(SEXP x) {
+        typedef SEXP(*Ptr_mem_release)(SEXP);
+        static Ptr_mem_release p_mem_release = NULL;
+        if (p_mem_release == NULL) {
+            validateSignature("void(*mem_release)(SEXP)");
+            p_mem_release = (Ptr_mem_release)R_GetCCallable("shmemr", "_shmemr_mem_release");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_mem_release(Shield<SEXP>(Rcpp::wrap(x)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+    }
+
     inline void mem_attach(SEXP x) {
         typedef SEXP(*Ptr_mem_attach)(SEXP);
         static Ptr_mem_attach p_mem_attach = NULL;
