@@ -19,27 +19,11 @@ new_mem <- function(length, name = rand_name(),
   res
 }
 
-#' @export
-length.Memory <- get_mem_length
+mem_name <- function(x) .subset2(x, "name")
 
-#' @export
-`length<-.Memory` <- function(x, value) {
+mem_length <- function(x) .subset2(x, "length")
 
-  assert_that(is_count(value))
-
-  mem_resize(x, as.numeric(value))
-
-  invisible(x)
-}
-
-#' @export
-names.Memory <- function(x) get_mem_id(x)
-
-#' @export
-name <- function(x) {
-  assert_that(is_mem(x))
-  get_mem_id(x)
-}
+mem_type <- function(x) .subset2(x, "type")
 
 #' @export
 mem_ptr <- function(x) {
@@ -47,18 +31,34 @@ mem_ptr <- function(x) {
   get_mem_ptr(x)
 }
 
-#' @export
-str.Memory <- function(x, ...) {
-  len <- big_mark(get_mem_length(x), digits = 0L, format = "f")
-  cat("<Memory>\n",
-      "name:    ", get_mem_id(x), "\n",
-      "length:  ", len, "\n",
-      "address: ", get_mem_str(x), "\n",
-      "type:    ", class(x)[1L], "\n", sep = "")
+is_name_consistent <- function(x) {
+  identical(mem_name(x), get_mem_id(x))
+}
+
+is_length_consistent <- function(x) {
+  identical(mem_length(x), get_mem_length(x))
+}
+
+is_type_consistent <- function(x) {
+
+  cls <- class(x)
+
+  if ("Memory" %in% cls) {
+    ind <- which("Memory" == cls) - 1L
+    if (ind < 0L) return(identical(mem_type(x), cls[ind]))
+  }
+
+  FALSE
 }
 
 #' @export
-print.Memory <- function(x, ...) {
-  len <- big_mark(get_mem_length(x), digits = 0L, format = "f")
-  cat("<", class(x)[1L], "[", len, "]> ", get_mem_str(x), "\n", sep = "")
+is_mem_consistent <- function(x) {
+  is_mem(x) &&
+    is_name_consistent(x) &&
+    is_length_consistent(x) &&
+    is_type_consistent(x)
+}
+
+mem_len_print <- function(x) {
+  big_mark(mem_length(x), digits = 0L, format = "f")
 }

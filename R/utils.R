@@ -32,7 +32,7 @@ big_mark <- function(x, ...) {
   formatC(x, big.mark = mark, ...)
 }
 
-rand_name <- function(length = 15L, chars = c(letters, LETTERS, 0L:9L)) {
+rand_name <- function(length = 7L, chars = c(letters, LETTERS, 0L:9L)) {
 
   assert_that(
     is_count(length), is.character(chars), length(chars) >= 1L
