@@ -19,8 +19,7 @@
 #include <Rcpp.h>
 
 #define shmemr_debug(fmt, ...) \
-  do { if (SHMEMR_DEBUG) Rprintf("%s:%d: " fmt, \
-                                 short_file_name(__FILE__), \
+  do { if (SHMEMR_DEBUG) Rprintf("%s:%d: " fmt, __FILE__, \
                                  __LINE__, __VA_ARGS__); } while (0)
 
 #endif  // INST_INCLUDE_SHMEMR_UTILS_H_

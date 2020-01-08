@@ -45,8 +45,8 @@ Memory* create_mem(std::string name, double length, std::string type)
     throw std::runtime_error("Unsupported memory type.");
   }
 
-  shmemr_debug("Successfully created %s object <%s[%.0f]>\n",
-               type.c_str(), name.c_str(), length);
+  shmemr_debug("Successfully created <%s[%.0f]> object `%s`\n", type.c_str(),
+      length, name.c_str());
 
   return res;
 }
@@ -71,7 +71,10 @@ Rcpp::XPtr<Memory> memptr(SEXP x)
     lst["ptr"] = Rcpp::wrap(res);
   }
 
-  shmemr_debug("Using external pointer at <%p>\n", res.get());
+  std::string name = lst["name"];
+
+  shmemr_debug("Using external pointer at <%p> for `%s`.\n", res.get(),
+      name.c_str());
 
   return res;
 }
@@ -103,8 +106,7 @@ void mem_release(SEXP x)
 
   if (ptr)
   {
-    shmemr_debug("Releasing memory segment %s<%p>", ptr->get_id().c_str(),
-        ptr->get_address());
+    shmemr_debug("Releasing memory segment `%s`", ptr->get_id().c_str());
 
     ptr->remove();
   }
@@ -159,8 +161,7 @@ void mem_remove(SEXP x)
 {
   auto ptr = memptr(x);
 
-  shmemr_debug("Releasing memory segment %s<%p>", ptr->get_id().c_str(),
-      ptr->get_address());
+  shmemr_debug("Releasing memory segment `%s`", ptr->get_id().c_str());
 
   ptr->remove();
 }
@@ -171,9 +172,8 @@ void mem_resize(SEXP x, double new_length)
   auto lst = Rcpp::List(x);
   auto ptr = memptr(x);
 
-  shmemr_debug("Resizing (%.0f -> %.0f) memory segment at %s<%p>",
-      Rcpp::as<double>(lst["length"]), new_length, ptr->get_id().c_str(),
-      ptr->get_address());
+  shmemr_debug("Resizing (%.0f -> %.0f) memory segment `%s`",
+      Rcpp::as<double>(lst["length"]), new_length, ptr->get_id().c_str());
 
   lst["length"] = Rcpp::wrap(new_length);
 
