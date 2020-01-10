@@ -18,8 +18,12 @@
 
 #include <Rcpp.h>
 
-#define shmemr_debug(fmt, ...) \
-  do { if (SHMEMR_DEBUG) Rprintf("%s:%d: " fmt, __FILE__, \
-                                 __LINE__, __VA_ARGS__); } while (0)
+#ifdef SHMEMR_DEBUG
+  #define shmemr_debug(fmt, ...) do { \
+    Rprintf("%s:%d: " fmt "\n", __FILE__, __LINE__, __VA_ARGS__); \
+  } while (0)
+#else
+  #define shmemr_debug(fmt, ...)
+#endif
 
 #endif  // INST_INCLUDE_SHMEMR_UTILS_H_
