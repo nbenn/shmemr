@@ -8,6 +8,39 @@
 
 using namespace Rcpp;
 
+// mem_types
+Rcpp::StringVector mem_types();
+static SEXP _shmemr_mem_types_try() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    rcpp_result_gen = Rcpp::wrap(mem_types());
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _shmemr_mem_types() {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_shmemr_mem_types_try());
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // mem_init
 Rcpp::List mem_init(std::string name, double length, std::string type);
 static SEXP _shmemr_mem_init_try(SEXP nameSEXP, SEXP lengthSEXP, SEXP typeSEXP) {
@@ -385,6 +418,7 @@ RcppExport SEXP _shmemr_mem_resize(SEXP xSEXP, SEXP new_lengthSEXP) {
 static int _shmemr_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
+        signatures.insert("Rcpp::StringVector(*mem_types)()");
         signatures.insert("Rcpp::List(*mem_init)(std::string,double,std::string)");
         signatures.insert("void(*mem_release)(SEXP)");
         signatures.insert("void(*mem_attach)(SEXP)");
@@ -402,6 +436,7 @@ static int _shmemr_RcppExport_validate(const char* sig) {
 
 // registerCCallable (register entry points for exported C++ functions)
 RcppExport SEXP _shmemr_RcppExport_registerCCallable() { 
+    R_RegisterCCallable("shmemr", "_shmemr_mem_types", (DL_FUNC)_shmemr_mem_types_try);
     R_RegisterCCallable("shmemr", "_shmemr_mem_init", (DL_FUNC)_shmemr_mem_init_try);
     R_RegisterCCallable("shmemr", "_shmemr_mem_release", (DL_FUNC)_shmemr_mem_release_try);
     R_RegisterCCallable("shmemr", "_shmemr_mem_attach", (DL_FUNC)_shmemr_mem_attach_try);
@@ -418,6 +453,7 @@ RcppExport SEXP _shmemr_RcppExport_registerCCallable() {
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_shmemr_mem_types", (DL_FUNC) &_shmemr_mem_types, 0},
     {"_shmemr_mem_init", (DL_FUNC) &_shmemr_mem_init, 3},
     {"_shmemr_mem_release", (DL_FUNC) &_shmemr_mem_release, 1},
     {"_shmemr_mem_attach", (DL_FUNC) &_shmemr_mem_attach, 1},

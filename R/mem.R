@@ -1,7 +1,6 @@
 
 #' @export
-new_mem <- function(length, name = rand_name(),
-                    type = c("SharedMemory", "FileMemory"),
+new_mem <- function(length, name = rand_name(), type = mem_types(),
                     auto_cleanup = TRUE) {
 
   type <- match.arg(type)

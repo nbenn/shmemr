@@ -80,6 +80,12 @@ Rcpp::XPtr<Memory> memptr(SEXP x)
 }
 
 // [[Rcpp::export]]
+Rcpp::StringVector mem_types()
+{
+  return Rcpp::StringVector("SharedMemory", "FileMemory");
+}
+
+// [[Rcpp::export]]
 Rcpp::List mem_init(std::string name, double length, std::string type)
 {
   auto mem = create_mem(name, length, type);

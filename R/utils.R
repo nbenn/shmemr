@@ -32,6 +32,7 @@ big_mark <- function(x, ...) {
   formatC(x, big.mark = mark, ...)
 }
 
+#' @export
 rand_name <- function(length = 7L, chars = c(letters, LETTERS, 0L:9L)) {
 
   assert_that(
@@ -40,3 +41,6 @@ rand_name <- function(length = 7L, chars = c(letters, LETTERS, 0L:9L)) {
 
   paste(sample(chars, length, replace = TRUE), collapse = "")
 }
+
+#' @export
+list_mem_types <- function() mem_types()

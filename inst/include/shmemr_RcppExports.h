@@ -24,6 +24,27 @@ namespace shmemr {
         }
     }
 
+    inline Rcpp::StringVector mem_types() {
+        typedef SEXP(*Ptr_mem_types)();
+        static Ptr_mem_types p_mem_types = NULL;
+        if (p_mem_types == NULL) {
+            validateSignature("Rcpp::StringVector(*mem_types)()");
+            p_mem_types = (Ptr_mem_types)R_GetCCallable("shmemr", "_shmemr_mem_types");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_mem_types();
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
+    }
+
     inline Rcpp::List mem_init(std::string name, double length, std::string type) {
         typedef SEXP(*Ptr_mem_init)(SEXP,SEXP,SEXP);
         static Ptr_mem_init p_mem_init = NULL;
