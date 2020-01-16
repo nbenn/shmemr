@@ -1,7 +1,6 @@
 
 #' @export
-new_mem <- function(length, name = rand_name(), type = mem_types(),
-                    auto_cleanup = TRUE) {
+new_mem <- function(length, name = rand_name(), type = list_mem_types()) {
 
   type <- match.arg(type)
 
@@ -10,10 +9,6 @@ new_mem <- function(length, name = rand_name(), type = mem_types(),
   res <- mem_init(name, as.numeric(length), type)
 
   class(res) <- c(type, "Memory")
-
-  if (auto_cleanup) {
-    reg.finalizer(.subset2(res, "ptr"), mem_release, onexit = TRUE)
-  }
 
   res
 }

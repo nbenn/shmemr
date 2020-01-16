@@ -24,11 +24,11 @@ namespace shmemr {
         }
     }
 
-    inline Rcpp::StringVector mem_types() {
+    inline Rcpp::CharacterVector mem_types() {
         typedef SEXP(*Ptr_mem_types)();
         static Ptr_mem_types p_mem_types = NULL;
         if (p_mem_types == NULL) {
-            validateSignature("Rcpp::StringVector(*mem_types)()");
+            validateSignature("Rcpp::CharacterVector(*mem_types)()");
             p_mem_types = (Ptr_mem_types)R_GetCCallable("shmemr", "_shmemr_mem_types");
         }
         RObject rcpp_result_gen;
@@ -42,7 +42,7 @@ namespace shmemr {
             throw Rcpp::LongjumpException(rcpp_result_gen);
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
-        return Rcpp::as<Rcpp::StringVector >(rcpp_result_gen);
+        return Rcpp::as<Rcpp::CharacterVector >(rcpp_result_gen);
     }
 
     inline Rcpp::List mem_init(std::string name, double length, std::string type) {

@@ -79,17 +79,26 @@ Rcpp::XPtr<Memory> memptr(SEXP x)
   return res;
 }
 
-// [[Rcpp::export]]
-Rcpp::StringVector mem_types()
+void mem_destroy(Memory* mem)
 {
-  return Rcpp::StringVector("SharedMemory", "FileMemory");
+  shmemr_debug("Releasing memory segment `%s`", mem->get_id().c_str());
+
+  mem->remove();
+  delete mem;
+}
+
+// [[Rcpp::export]]
+Rcpp::CharacterVector mem_types()
+{
+  return Rcpp::CharacterVector::create("SharedMemory", "FileMemory");
 }
 
 // [[Rcpp::export]]
 Rcpp::List mem_init(std::string name, double length, std::string type)
 {
   auto mem = create_mem(name, length, type);
-  auto ptr = Rcpp::XPtr<Memory>(mem, true);
+  auto ptr = Rcpp::XPtr<Memory, Rcpp::PreserveStorage, mem_destroy, true>(mem,
+      true);
 
   return Rcpp::List::create(
     Rcpp::Named("name") = Rcpp::wrap(name),

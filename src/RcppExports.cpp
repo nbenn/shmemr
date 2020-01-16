@@ -9,7 +9,7 @@
 using namespace Rcpp;
 
 // mem_types
-Rcpp::StringVector mem_types();
+Rcpp::CharacterVector mem_types();
 static SEXP _shmemr_mem_types_try() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -418,7 +418,7 @@ RcppExport SEXP _shmemr_mem_resize(SEXP xSEXP, SEXP new_lengthSEXP) {
 static int _shmemr_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
-        signatures.insert("Rcpp::StringVector(*mem_types)()");
+        signatures.insert("Rcpp::CharacterVector(*mem_types)()");
         signatures.insert("Rcpp::List(*mem_init)(std::string,double,std::string)");
         signatures.insert("void(*mem_release)(SEXP)");
         signatures.insert("void(*mem_attach)(SEXP)");
