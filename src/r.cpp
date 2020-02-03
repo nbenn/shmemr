@@ -30,6 +30,10 @@ Rcpp::XPtr<T> xptr(SEXP x)
 Memory* create_mem(std::string name, double length, std::string type)
 {
   auto len = static_cast<std::size_t>(length);
+
+  // TODO: check whether len & length are identical
+  // https://stackoverflow.com/q/33719132/3855417
+
   Memory* res;
 
   if (type == "SharedMemory")
@@ -51,6 +55,20 @@ Memory* create_mem(std::string name, double length, std::string type)
   return res;
 }
 
+// [[Rcpp::export]]
+Rcpp::List mem_reinit(SEXP x)
+{
+  auto lst = Rcpp::List(x);
+
+  shmemr_debug("%s\n", "Recreating external pointer");
+
+  auto mem = create_mem(lst["name"], lst["length"], lst["type"]);
+  auto ptr = Rcpp::XPtr<Memory>(mem, true);
+  lst["ptr"] = Rcpp::wrap(ptr);
+
+  return lst;
+}
+
 Rcpp::XPtr<Memory> memptr(SEXP x)
 {
   auto lst = Rcpp::List(x);
@@ -64,11 +82,8 @@ Rcpp::XPtr<Memory> memptr(SEXP x)
 
   if (!res)
   {
-    shmemr_debug("%s\n", "Recreating external pointer");
-
-    auto mem = create_mem(lst["name"], lst["length"], lst["type"]);
-    res = Rcpp::XPtr<Memory>(mem, true);
-    lst["ptr"] = Rcpp::wrap(res);
+    lst = mem_reinit(x);
+    res = xptr<Memory>(lst["ptr"]);
   }
 
   std::string name = lst["name"];
