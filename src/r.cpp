@@ -102,6 +102,7 @@ void mem_destroy(Memory* mem)
   delete mem;
 }
 
+//' @export
 // [[Rcpp::export]]
 Rcpp::CharacterVector mem_types()
 {

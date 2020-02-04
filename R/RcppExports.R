@@ -5,6 +5,7 @@ mem_reinit <- function(x) {
     .Call(`_shmemr_mem_reinit`, x)
 }
 
+#' @export
 mem_types <- function() {
     .Call(`_shmemr_mem_types`)
 }
